@@ -14,8 +14,9 @@
 <body>
   <div id="container"></div>
 
-  <script src="js/three.js"></script>
+  <script type="text/javascript" src="/js/three.js"></script>
   <script type="text/javascript" src="/js/dat.gui.js"></script>
+  <script type="text/javascript" src="/js/stats.js"></script>
 
   <script id="vertexShader" type="x-shader/x-vertex">
   void main() {
@@ -35,7 +36,7 @@
   <script>
   var container;
   var camera, scene, renderer;
-  var gui;
+  var gui, stats;
   var uniforms;
   var video, texture;
 
@@ -75,6 +76,10 @@
     guiFolderPlane.add(mesh.position, 'y');
     guiFolderPlane.add(mesh.position, 'z');
     guiFolderPlane.open();
+
+    // debug
+    stats = new Stats();
+    document.body.appendChild(stats.dom);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -156,8 +161,12 @@
   }
 
   function animate() {
+    stats.begin();
+
     requestAnimationFrame(animate);
     render();
+
+    stats.end();
   }
 
   function render() {
