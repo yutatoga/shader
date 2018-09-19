@@ -41,6 +41,7 @@
   var video, texture;
 
   init();
+  animate();
 
   function init() {
     container = document.getElementById('container');
@@ -117,8 +118,6 @@
         video.style.height = video.videoHeight + 'px';
         video.play();
         initPlaneVideo(video);
-
-        animate();
       };
     })
     .catch(function(err) {
@@ -171,7 +170,7 @@
 
   function render() {
     renderer.render(scene, camera);
-    if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+    if (video && video.readyState === video.HAVE_ENOUGH_DATA ) {
 			texture.needsUpdate = true;
 		}
   }
