@@ -129,7 +129,6 @@
   }
 
   settings.key = 'brownie';
-  settings.currentColorMatrix = settings.colorMatrix.brownie.slice();
 
   init();
   animate();
@@ -164,7 +163,7 @@
         value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0)
       },
       u_colorMatrix: {
-        value: settings.currentColorMatrix
+        value: settings.colorMatrix[settings.key]
       }
     };
     onWindowResize();
@@ -239,15 +238,13 @@
     guiFolderPlaneVideo.open();
 
     var guiFolderColorMatrix = gui.addFolder('u_colorMatrix');
-    guiFolderColorMatrix.add(settings, 'currentColorMatrix', settings.colorMatrix).onChange(function(v){
-      settings.currentColorMatrix = settings.currentColorMatrix.split(',').map(Number);
+    guiFolderColorMatrix.add(settings, 'key', Object.keys(settings.colorMatrix)).onChange(function(key){
       for (var i = 0; i < uniforms.u_colorMatrix.value.length; i++){
-        uniforms.u_colorMatrix.value[i] = settings.currentColorMatrix[i];
+        uniforms.u_colorMatrix.value[i] = settings.colorMatrix[key][i];
       }
     });
-
     // R
-    guiFolderColorMatrix.add(settings.currentColorMatrix, '0').name('R: r').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '0').name('R: r').listen();
     guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '1').name('R: g').listen();
     guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '2').name('R: b').listen();
     guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '4').name('R: n').listen();
@@ -262,11 +259,6 @@
     guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '12').name('B: b').listen();
     guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '14').name('B: n').listen();
 
-    guiFolderColorMatrix.add(settings, 'key', Object.keys(settings.colorMatrix)).onChange(function(key){
-      for (var i = 0; i < uniforms.u_colorMatrix.value.length; i++){
-        uniforms.u_colorMatrix.value[i] = settings.colorMatrix[key][i];
-      }
-    });
     guiFolderColorMatrix.open();
 
   }
