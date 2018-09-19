@@ -128,6 +128,7 @@
     settings.colorMatrix[key][19] /= 255.0;
   }
 
+  settings.key = 'brownie';
   settings.currentColorMatrix = settings.colorMatrix.brownie.slice();
 
   init();
@@ -237,12 +238,36 @@
     guiFolderPlaneVideo.add(mesh.position, 'z').name('position.z');
     guiFolderPlaneVideo.open();
 
-    var guiFolderPlaneVideo = gui.addFolder('u_colorMatrix');
-    guiFolderPlaneVideo.add(settings, 'currentColorMatrix', settings.colorMatrix).onChange(function(v){
-      settings.currentColorMatrix = settings.currentColorMatrix.split(',');
-      uniforms.u_colorMatrix.value = settings.currentColorMatrix;
+    var guiFolderColorMatrix = gui.addFolder('u_colorMatrix');
+    guiFolderColorMatrix.add(settings, 'currentColorMatrix', settings.colorMatrix).onChange(function(v){
+      settings.currentColorMatrix = settings.currentColorMatrix.split(',').map(Number);
+      for (var i = 0; i < uniforms.u_colorMatrix.value.length; i++){
+        uniforms.u_colorMatrix.value[i] = settings.currentColorMatrix[i];
+      }
     });
-    guiFolderPlaneVideo.open();
+
+    // R
+    guiFolderColorMatrix.add(settings.currentColorMatrix, '0').name('R: r').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '1').name('R: g').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '2').name('R: b').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '4').name('R: n').listen();
+    // G
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '5').name('G: r').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '6').name('G: g').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '7').name('G: b').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '9').name('G: n').listen();
+    // B
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '10').name('B: r').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '11').name('B: g').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '12').name('B: b').listen();
+    guiFolderColorMatrix.add(uniforms.u_colorMatrix.value, '14').name('B: n').listen();
+
+    guiFolderColorMatrix.add(settings, 'key', Object.keys(settings.colorMatrix)).onChange(function(key){
+      for (var i = 0; i < uniforms.u_colorMatrix.value.length; i++){
+        uniforms.u_colorMatrix.value[i] = settings.colorMatrix[key][i];
+      }
+    });
+    guiFolderColorMatrix.open();
 
   }
 
