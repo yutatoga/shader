@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>shader</title>
+  <style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <script src="js/three.js"></script>
+  <script type="text/javascript" src="/js/dat.gui.js"></script>
+
+  <script id="vertexShader" type="x-shader/x-vertex">
+  void main() {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  </script>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+  uniform vec2 u_resolution;
+
+  void main() {
+    vec2 st = gl_FragCoord.xy / u_resolution.xy;
+    gl_FragColor = vec4(st.x, 0, 0, 0.8);
+  }
+  </script>
+
+  <script>
+  var container;
+  var camera, scene, renderer;
+  var gui;
+  var uniforms;
+  var video, texture;
+
+  init();
+
+  function init() {
+    container = document.getElementById('container');
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.z = 1000;
+
+    var geometry = new THREE.PlaneBufferGeometry(800, 800);
+
+    uniforms = {
+      u_resolution: {
+        type: "v2",
+        value: new THREE.Vector2()
+      },
+    };
+
+    var material = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: document.getElementById('vertexShader').textContent,
+      fragmentShader: document.getElementById('fragmentShader').textContent,
+      transparent: true
+    });
+
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.z = -1;
+    scene.add(mesh);
+
+    // gui
+    gui = new dat.GUI();
+    var guiFolderPlane = gui.addFolder('Shader Plane');
+    guiFolderPlane.add(mesh.position, 'x');
+    guiFolderPlane.add(mesh.position, 'y');
+    guiFolderPlane.add(mesh.position, 'z');
+    guiFolderPlane.open();
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    container.appendChild(renderer.domElement);
+
+    onWindowResize();
+    window.addEventListener('resize', onWindowResize, false);
+
+    // webcam
+    navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
+       getUserMedia: function(c) {
+         return new Promise(function(y, n) {
+           (navigator.mozGetUserMedia ||
+            navigator.webkitGetUserMedia).call(navigator, c, y, n);
+         });
+       }
+    } : null);
+
+    if (!navigator.mediaDevices) {
+      console.log("getUserMedia() not supported.");
+      return;
+    }
+
+    // Prefer camera resolution nearest to 1280x720.
+    var constraints = { audio: false, video: true };
+
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      // video = document.querySelector('video');
+      video = document.createElement('video');
+      video.srcObject = stream;
+      video.onloadedmetadata = function(e) {
+        video.style.width = video.videoWidth + 'px';
+        video.style.height = video.videoHeight + 'px';
+        video.play();
+        initPlaneVideo(video);
+
+        animate();
+      };
+    })
+    .catch(function(err) {
+      console.log(err.name + ": " + err.message);
+    });
+
+  }
+
+  function initPlaneVideo(video){
+    texture = new THREE.Texture(video);
+		texture.minFilter = THREE.NearestFilter;
+		texture.magFilter = THREE.NearestFilter;
+		texture.format = THREE.RGBFormat;
+		texture.generateMipmaps = false;
+		texture.needsUpdate = true;
+
+		var material = new THREE.MeshBasicMaterial( {
+				map: texture,
+        depthTest: true
+		} );
+    var geometry = new THREE.PlaneGeometry(video.videoWidth, video.videoHeight);
+		var mesh = new THREE.Mesh(geometry, material);
+		scene.add(mesh);
+
+    var guiFolderPlaneVideo = gui.addFolder('Web Camera Plane');
+    guiFolderPlaneVideo.add(mesh.position, 'x');
+    guiFolderPlaneVideo.add(mesh.position, 'y');
+    guiFolderPlaneVideo.add(mesh.position, 'z');
+    guiFolderPlaneVideo.open();
+  }
+
+  function onWindowResize(event) {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    uniforms.u_resolution.value.x = renderer.domElement.width;
+    uniforms.u_resolution.value.y = renderer.domElement.height;
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  function render() {
+    renderer.render(scene, camera);
+    if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+			texture.needsUpdate = true;
+		}
+  }
+
+  </script>
+</body>
+</html>
