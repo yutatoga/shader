@@ -214,6 +214,8 @@
     .then(function(stream) {
       // video = document.querySelector('video');
       video = document.createElement('video');
+      video.autoplay = true; // to play video on iOS
+      video.setAttribute('playsinline', ''); // to play video on iOS
       video.srcObject = stream;
       video.onloadedmetadata = function(e) {
         video.style.width = video.videoWidth + 'px';
