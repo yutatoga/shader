@@ -132,8 +132,12 @@
         var guiFolderBloom = gui.addFolder('bloom');
         guiFolderBloom.open();
         guiFolderBloom.add(bloomPass, 'strength').min(0.0).step(0.01);
-        guiFolderBloom.add(bloomPass, 'radius', 0.0, 1.0).step(0.01);;
-        guiFolderBloom.add(bloomPass, 'threshold', 0.0, 1.0).step(0.01);;
+        guiFolderBloom.add(bloomPass, 'radius').step(0.01);
+        guiFolderBloom.add(bloomPass, 'threshold', 0.0, 1.0).step(0.01);
+        // - renderer
+        var guiFolderRenderer = gui.addFolder('renderer');
+        guiFolderRenderer.open();
+        guiFolderRenderer.add(renderer, 'toneMappingExposure').min(0.0).step(0.01);
 
         // window
         onWindowResize();
