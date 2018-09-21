@@ -51,7 +51,7 @@
             y: 0.005
           },
           material: {
-            color: 0xffffff
+            color: '#ffffff'
           }
         },
         postprocessing: {
@@ -138,6 +138,12 @@
         var guiFolderRenderer = gui.addFolder('renderer');
         guiFolderRenderer.open();
         guiFolderRenderer.add(renderer, 'toneMappingExposure').min(0.0).step(0.01);
+        // - material
+        var guiFolderMesh = gui.addFolder('mesh');
+        guiFolderMesh.open();
+        guiFolderMesh.addColor(settings.mesh.material, 'color').onChange(function(color){
+          mesh.material.color.setStyle(color);
+        });
 
         // window
         onWindowResize();
