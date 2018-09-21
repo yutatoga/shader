@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>shader</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container"></div>
+
+    <script src="/js/three.js"></script>
+    <script src="/js/dat.gui.js"></script>
+    <script src="/js/stats.js"></script>
+
+    <script src="/js/postprocessing/EffectComposer.js"></script>  <!-- make postprocessing -->
+    <script src="/js/postprocessing/RenderPass.js"></script>      <!-- connect renderer's drawing with postprocessing -->
+    <script src="/js/postprocessing/ShaderPass.js"></script>      <!-- EffectComposer uses -->
+    <script src="/js/shader/CopyShader.js"></script>              <!-- EffectComposer uses -->
+    <script src="/js/shader/LuminosityHighPassShader.js"></script><!-- UnrealBloomPass uses -->
+    <script src="/js/postprocessing/UnrealBloomPass.js"></script> <!-- postprocessing itself -->
+
+    <script>
+      var container;
+      var camera, scene, renderer;
+      var composer;
+      var clock, gui, stats;
+      var mesh;
+      var settings = {
+        renderer: {
+          antialias: true,
+          toneMappingExposure: 1.0
+        },
+        camera: {
+          fov: 60,
+          near: 1,
+          far: 1000,
+          position: {
+            z: 10
+          }
+        },
+        mesh: {
+          rotationSpeed: {
+            x: 0.005,
+            y: 0.005
+          },
+          material: {
+            color: 0xffffff
+          }
+        },
+        postprocessing: {
+          bloom: {
+            resolution: THREE.Vector2(window.innerWidth, window.innerHeight),
+            strength: 1.5,
+            radius: 1.0,
+            threshold: 0.5
+          }
+        },
+        light: {
+          ambientLight: {
+            color: 0x404040,
+            intensity: 1.0
+          },
+          pointLight: {
+            color: 0xffffff,
+            intensity: 1.0
+          }
+        }
+      }
+
+      init();
+      animate();
+
+      function init() {
+
+        // renderer
+        renderer = new THREE.WebGLRenderer({antialias: settings.renderer.antialias});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container = document.getElementById('container');
+        container.appendChild(renderer.domElement);
+
+        // scene
+        scene = new THREE.Scene();
+
+        // camera
+        camera = new THREE.PerspectiveCamera(settings.camera.fov, window.innerWidth / window.innerHeight, settings.camera.near, settings.camera.far);
+        camera.position.z = settings.camera.position.z;
+        scene.add(camera);
+
+        // light
+        scene.add(new THREE.AmbientLight(settings.light.ambientLight.color, settings.light.ambientLight.intensity));
+        pointLight = new THREE.PointLight(settings.light.pointLight.color, settings.light.pointLight.intensity);
+        camera.add(pointLight);
+
+        // objects
+        var geometry = new THREE.BoxGeometry()
+        var material = new THREE.MeshPhongMaterial({color: settings.mesh.material.color});
+        mesh = new THREE.Mesh(geometry, material)
+        scene.add(mesh)
+
+        // postprocessing
+        var renderPass = new THREE.RenderPass(scene, camera);
+        var bloomPass = new THREE.UnrealBloomPass(
+          settings.postprocessing.bloom.resolution,
+          settings.postprocessing.bloom.strength,
+          settings.postprocessing.bloom.radius,
+          settings.postprocessing.bloom.threshold
+        );
+        bloomPass.renderToScreen = true;
+
+        composer = new THREE.EffectComposer(renderer);
+        // default composer size is renderer.getDrawingBufferSize() which may be retina. (depends on window.devicePixelRatio).
+        composer.setSize(window.innerWidth, window.innerHeight); // window.innerWidth and window.innerHeight are NOT retina.
+        composer.addPass(renderPass);
+        composer.addPass(bloomPass);
+
+        // utils
+        clock = new THREE.Clock();
+        stats = new Stats();
+        document.body.appendChild(stats.dom);
+
+        // gui
+        gui = new dat.GUI();
+        // - bloom
+        var guiFolderBloom = gui.addFolder('bloom');
+        guiFolderBloom.open();
+        guiFolderBloom.add(bloomPass, 'strength').min(0.0).step(0.01);
+        guiFolderBloom.add(bloomPass, 'radius', 0.0, 1.0).step(0.01);;
+        guiFolderBloom.add(bloomPass, 'threshold', 0.0, 1.0).step(0.01);;
+
+        // window
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize, false);
+
+      }
+
+      function onWindowResize(event) {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(width, height);
+        composer.setSize(width, height);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const delta = clock.getDelta();
+
+        stats.update();
+
+        composer.render(delta);
+
+        mesh.rotation.x += settings.mesh.rotationSpeed.x;
+        mesh.rotation.y += settings.mesh.rotationSpeed.y;
+
+      }
+    </script>
+  </body>
+
+</html>
