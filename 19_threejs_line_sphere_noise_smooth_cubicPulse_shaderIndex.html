@@ -288,8 +288,26 @@
       gl_FragColor = vec4(1.0, 1.0, 1.0, ans);
     }
     if(fragmentShaderIndex == 6){
+      // invert versino of 6
+      float invertY = 1.0 - vUv.y;
+      float squareWave = abs(fract(lines * invertY) * 2.0 - 1.0);
+      float squareWave2 = abs(1.0/(invertY * 10.0) * abs(fract(lines * invertY) * 2.0 - 1.0));
+      float mini = min(squareWave, squareWave2);
+      float ans = smoothstep(0.0, 1.0, mini);
+      gl_FragColor = vec4(1.0, 1.0, 1.0, ans);
+    }
+    if(fragmentShaderIndex == 7){
       float squareWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
-      float squareWave2 = abs((3.0 * vUv.y * vUv.y) * abs(fract(lines * vUv.y) * 2.0 - 1.0));
+      float squareWave2 = abs((5.0 * vUv.y * vUv.y) * abs(fract(lines * vUv.y) * 2.0 - 1.0));
+      float mini = min(squareWave, squareWave2);
+      float ans = smoothstep(0.0, 1.0, mini);
+      gl_FragColor = vec4(1.0, 0.0, 0.0, ans);
+    }
+    if(fragmentShaderIndex == 8){
+      // invert version of 7
+      float invertY = 1.0 - vUv.y;
+      float squareWave = abs(fract(lines * invertY) * 2.0 - 1.0);
+      float squareWave2 = abs((5.0 * invertY * invertY) * abs(fract(lines * invertY) * 2.0 - 1.0));
       float mini = min(squareWave, squareWave2);
       float ans = smoothstep(0.0, 1.0, mini);
       gl_FragColor = vec4(1.0, 0.0, 0.0, ans);
@@ -363,7 +381,7 @@
         type: "i",
         value: 0,
         min: 0,
-        max: 6
+        max: 8
       },
       vertexShaderIndex: {
         type: "i",
