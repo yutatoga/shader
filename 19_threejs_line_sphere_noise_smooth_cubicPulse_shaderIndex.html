@@ -280,6 +280,13 @@
       float y = cubicPulse(0.5, linewidth, sawthoothWave);
       gl_FragColor = vec4(1.0, 1.0, 1.0, y);
     }
+    if(fragmentShaderIndex == 5){
+      float squareWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
+      float squareWave2 = abs(1.0/(vUv.y * 10.0) * abs(fract(lines * vUv.y) * 2.0 - 1.0));
+      float mini = min(squareWave, squareWave2);
+      float ans = smoothstep(0.0, 1.0, mini);
+      gl_FragColor = vec4(1.0, 1.0, 1.0, ans);
+    }
   }
   </script>
 
@@ -349,7 +356,7 @@
         type: "i",
         value: 0,
         min: 0,
-        max: 4
+        max: 5
       },
       vertexShaderIndex: {
         type: "i",
