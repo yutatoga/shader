@@ -290,6 +290,12 @@
     var customEvents = {
       rotateGroupRotate: function(){
         groupRotate.rotateX(Math.PI * -0.5);
+      },
+      setCameraPositionInside: function(){
+        camera.position.set(0, 0, 10);
+      },
+      setCameraPositionOutside: function(){
+        camera.position.set(0, 0, 50);
       }
     }
 
@@ -386,6 +392,8 @@
     var gui = new dat.GUI();
     var guiFolderCustomEvent = gui.addFolder('Custom Event');
     guiFolderCustomEvent.add(customEvents, 'rotateGroupRotate');
+    guiFolderCustomEvent.add(customEvents, 'setCameraPositionInside');
+    guiFolderCustomEvent.add(customEvents, 'setCameraPositionOutside');
     guiFolderCustomEvent.open();
 
     var sceneFolder = gui.addFolder('Scene');
