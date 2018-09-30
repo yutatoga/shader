@@ -266,12 +266,9 @@
 
   <script>
 
-  var camera,
-  scene,
-  renderer;
-  var mesh,
-  material,
-  uniforms;
+  var camera, scene, renderer;
+  var mesh, material, uniforms;
+  var groupRotate = new THREE.Group();
   var clock = new THREE.Clock();
   init();
   animate();
@@ -288,6 +285,13 @@
     camera.position.z = 50;
 
     scene = new THREE.Scene();
+    scene.add(groupRotate);
+
+    var customEvents = {
+      rotateGroupRotate: function(){
+        groupRotate.rotateX(Math.PI * -0.5);
+      }
+    }
 
     var uniforms = {
       color: {
@@ -340,12 +344,12 @@
     );
     var geometry = new THREE.SphereGeometry(20, 100, 100);
     mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    groupRotate.add(mesh);
 
     stats = new Stats();
     document.body.appendChild(stats.domElement);
 
-    setupControls(uniforms);
+    setupControls(customEvents, uniforms);
 
     window.addEventListener('resize', onWindowResize, false);
   }
@@ -359,8 +363,6 @@
   function animate() {
     requestAnimationFrame(animate);
     material.uniforms['time'].value = clock.getElapsedTime();
-    // mesh.rotation.x += 0.005;
-    // mesh.rotation.y += 0.01;
     renderer.render(scene, camera);
     stats.update();
   }
@@ -380,8 +382,12 @@
     mesh.geometry = geometry;
   }
 
-  function setupControls(ob) {
+  function setupControls(customEvents, ob) {
     var gui = new dat.GUI();
+    var guiFolderCustomEvent = gui.addFolder('Custom Event');
+    guiFolderCustomEvent.add(customEvents, 'rotateGroupRotate');
+    guiFolderCustomEvent.open();
+
     var sceneFolder = gui.addFolder('Scene');
     var geoController = sceneFolder.add({
       Geometry: "sphere"
