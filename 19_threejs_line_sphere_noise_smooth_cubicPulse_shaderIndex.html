@@ -327,6 +327,7 @@
 
   var camera, scene, renderer;
   var mesh, material, uniforms;
+  var gui;
   var groupRotate = new THREE.Group();
   var clock = new THREE.Clock();
   init();
@@ -358,7 +359,7 @@
       }
     }
 
-    var uniforms = {
+    uniforms = {
       color: {
         type: "c",
         value: new THREE.Color(0xffffff)
@@ -460,7 +461,7 @@
   }
 
   function setupControls(customEvents, ob) {
-    var gui = new dat.GUI();
+    gui = new dat.GUI();
     var guiFolderCustomEvent = gui.addFolder('Custom Event');
     guiFolderCustomEvent.add(customEvents, 'rotateGroupRotate');
     guiFolderCustomEvent.add(customEvents, 'setCameraPositionInside');
@@ -473,27 +474,41 @@
     }, 'Geometry', ['box', 'sphere', 'torusknot']);
     geoController.onChange(changeGeometry);
     var uniformsFolder = gui.addFolder('Uniforms');
-    for (key in ob) {
+    for (let key in ob) {
       if(key != 'time'){
         if (ob[key].hidden === undefined || !ob[key].hidden) {
           if (ob[key].type == 'f' || ob[key].type == 'i') {
-            var controller = uniformsFolder.add(ob[key], 'value').name(key);
-            if (typeof ob[key].min != 'undefined') {
-              controller.min(ob[key].min).name(key);
+            if(typeof ob[key].min != 'undefined' && typeof ob[key].max != 'undefined'){
+              let controller = uniformsFolder.add(ob[key], 'value').min(ob[key].min).max(ob[key].max).name(key).onChange(function (value) {
+                if(key == 'fragmentShaderIndex' && value == 2){
+                  let color = [0.0, 255.0, 255.0];
+                  uniforms.color.guivalue = color;
+                  gui.__folders.Uniforms.__controllers[0].__onChange(color);
+                }
+              });
+              if(ob[key].type == 'i'){
+                controller.step(1);
+              }
+            } else {
+              // the code below doen't work: onChange is not called. see >> https://github.com/dataarts/dat.gui/issues/197
+              var controller = uniformsFolder.add(ob[key], 'value').name(key);
+              if (typeof ob[key].min != 'undefined') {
+                controller.min(ob[key].min).name(key);
+              }
+              if (typeof ob[key].max != 'undefined') {
+                controller.max(ob[key].max).name(key);
+              }
+              controller.onChange(function (value) {
+                this.object.value = parseFloat(value);
+              });
             }
-            if (typeof ob[key].max != 'undefined') {
-              controller.max(ob[key].max).name(key);
-            }
-            controller.onChange(function (value) {
-              this.object.value = parseFloat(value);
-            });
           } else if (ob[key].type == 'c') {
             ob[key].guivalue = [
               ob[key].value.r * 255,
               ob[key].value.g * 255,
               ob[key].value.b * 255
             ];
-            var controller = uniformsFolder.addColor(ob[key], 'guivalue').name(key);
+            var controller = uniformsFolder.addColor(ob[key], 'guivalue').name(key).listen();
             controller.onChange(function (value) {
               this.object.value.setRGB(value[0] / 255, value[1] / 255, value[2] / 255);
             });
