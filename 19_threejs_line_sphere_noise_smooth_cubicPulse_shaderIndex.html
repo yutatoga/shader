@@ -319,7 +319,7 @@
     if(fragmentShaderIndex == 9){
       float triangleWaveSweep = abs(fract(lines * pow((vUv.y + 1.0), power)) * 2.0 - 1.0);
       float ans = smoothstep(linewidth, 1.0, triangleWaveSweep);
-      gl_FragColor = vec4(0.0, 0.0, 1.0, ans);
+      gl_FragColor = vec4(color.rgb * ans, alpha);
     }
   }
   </script>
