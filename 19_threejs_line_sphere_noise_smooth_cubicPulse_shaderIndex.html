@@ -314,7 +314,7 @@
       float squareWave2 = abs((5.0 * invertY * invertY) * abs(fract(lines * invertY) * 2.0 - 1.0));
       float mini = min(squareWave, squareWave2);
       float ans = smoothstep(0.0, 1.0, mini);
-      gl_FragColor = vec4(1.0, 0.0, 0.0, ans);
+      gl_FragColor = vec4(color.rgb * ans, alpha);
     }
     if(fragmentShaderIndex == 9){
       float triangleWaveSweep = abs(fract(lines * pow((vUv.y + 1.0), power)) * 2.0 - 1.0);
