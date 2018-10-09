@@ -321,6 +321,12 @@
       float ans = smoothstep(linewidth, 1.0, triangleWaveSweep);
       gl_FragColor = vec4(color.rgb * ans, alpha);
     }
+    if(fragmentShaderIndex == 10){
+      // inverted triangleWaveSweep 9
+      float triangleWaveSweep = 1.0 - abs(fract(lines * pow((vUv.y + 1.0), power)) * 2.0 - 1.0);
+      float ans = smoothstep(linewidth, 1.0, triangleWaveSweep);
+      gl_FragColor = vec4(color.rgb * ans, alpha);
+    }
   }
   </script>
 
@@ -398,7 +404,7 @@
         type: "i",
         value: 0,
         min: 0,
-        max: 9
+        max: 10
       },
       vertexShaderIndex: {
         type: "i",
@@ -419,7 +425,8 @@
         6: { color: [255.0, 255.0, 255.0] },
         7: { color: [255.0, 255.0, 255.0] },
         8: { color: [255.0, 255.0, 255.0] },
-        9: { color: [255.0, 255.0, 255.0] }
+        9: { color: [255.0, 255.0, 255.0] },
+        10: { color: [255.0, 255.0, 255.0] }
       }
     }
 
@@ -499,7 +506,7 @@
             if(typeof ob[key].min != 'undefined' && typeof ob[key].max != 'undefined'){
               let controller = uniformsFolder.add(ob[key], 'value').min(ob[key].min).max(ob[key].max).name(key).onChange(function (value) {
                 if(key == 'fragmentShaderIndex'){
-                  let color = settings.fragmentShaderIndex[value].color;
+                  let color = value in settings.fragmentShaderIndex ? ('color' in settings.fragmentShaderIndex[value] ? settings.fragmentShaderIndex[value].color : [255.0, 0.0, 0.0]) : [0.0, 255.0, 0.0];
                   uniforms.color.guivalue = color;
                   gui.__folders.Uniforms.__controllers[0].__onChange(color);
                 }
