@@ -251,8 +251,8 @@
   void main() {
     if(fragmentShaderIndex == 0){
       float sawthoothWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
-      float y = cubicPulse(0.5, linewidth, sawthoothWave);
-      gl_FragColor = vec4(1.0, 1.0, 1.0, y);
+      float result = cubicPulse(0.5, linewidth, sawthoothWave);
+      gl_FragColor = vec4(result * color.r, result * color.g, result * color.b, alpha);
     }
     if(fragmentShaderIndex == 1){
       float sawthoothWave = abs(fract(lines * vUv.x) * 2.0 - 1.0);
