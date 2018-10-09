@@ -274,9 +274,9 @@
       float y = cubicPulse(0.5, linewidth, sawthoothWave);
       if (vUv.y < 0.5){
         vec3 invertColor = 1.0 - color.rgb;
-        gl_FragColor = vec4(invertColor, y);
+        gl_FragColor = vec4(invertColor * y, alpha);
       } else {
-        gl_FragColor = vec4(color.rgb, y);
+        gl_FragColor = vec4(color.rgb * y, alpha);
       }
     }
     if(fragmentShaderIndex == 4){
