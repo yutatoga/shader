@@ -396,7 +396,7 @@
       },
       power: {
         type: "f",
-        value: 1.0,
+        value: 15.0,
         min: 0.0,
         max: 100.0
       },
@@ -416,17 +416,9 @@
 
     settings = {
       fragmentShaderIndex: {
-        0: { color: [255.0, 255.0, 255.0] },
-        1: { color: [255.0, 255.0, 255.0] },
-        2: { color: [255.0, 255.0, 255.0] },
         3: { color: [0.0, 255.0, 255.0] },
-        4: { color: [255.0, 255.0, 255.0] },
-        5: { color: [255.0, 255.0, 255.0] },
-        6: { color: [255.0, 255.0, 255.0] },
-        7: { color: [255.0, 255.0, 255.0] },
-        8: { color: [255.0, 255.0, 255.0] },
-        9: { color: [255.0, 255.0, 255.0] },
-        10: { color: [255.0, 255.0, 255.0] }
+        9: { lines: 0.001 },
+        10: { lines: 0.001 }
       }
     }
 
@@ -506,9 +498,14 @@
             if(typeof ob[key].min != 'undefined' && typeof ob[key].max != 'undefined'){
               let controller = uniformsFolder.add(ob[key], 'value').min(ob[key].min).max(ob[key].max).name(key).onChange(function (value) {
                 if(key == 'fragmentShaderIndex'){
-                  let color = value in settings.fragmentShaderIndex ? ('color' in settings.fragmentShaderIndex[value] ? settings.fragmentShaderIndex[value].color : [255.0, 0.0, 0.0]) : [0.0, 255.0, 0.0];
+                  // color
+                  let color = value in settings.fragmentShaderIndex ? ('color' in settings.fragmentShaderIndex[value] ? settings.fragmentShaderIndex[value].color : [255.0, 255.0, 255.0]) : [255.0, 255.0, 255.0];
                   uniforms.color.guivalue = color;
                   gui.__folders.Uniforms.__controllers[0].__onChange(color);
+
+                  // lines
+                  let lines = value in settings.fragmentShaderIndex ? ('lines' in settings.fragmentShaderIndex[value] ? settings.fragmentShaderIndex[value].lines : 30.0) : 30.0;
+                  uniforms.lines.value = lines;
                 }
               });
               if(ob[key].type == 'i'){
