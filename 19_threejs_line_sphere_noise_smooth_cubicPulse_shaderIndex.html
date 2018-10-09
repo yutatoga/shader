@@ -282,7 +282,7 @@
     if(fragmentShaderIndex == 4){
       float sawthoothWave = abs(fract(lines * pow(vUv.y, 5.0)) * 2.0 - 1.0);
       float y = cubicPulse(0.5, linewidth, sawthoothWave);
-      gl_FragColor = vec4(1.0, 1.0, 1.0, y);
+      gl_FragColor = vec4(color.rgb * y, alpha);
     }
     if(fragmentShaderIndex == 5){
       float squareWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
