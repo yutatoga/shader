@@ -260,12 +260,14 @@
       gl_FragColor = vec4(result * color.r, result * color.g, result * color.b, alpha);
     }
     if(fragmentShaderIndex == 2){
-      float sawthoothWave1 = abs(fract(lines * vUv.y) * 2.0 - 1.0);
-      float y = cubicPulse(0.5, linewidth, sawthoothWave1);
+      float sawthoothWaveX = abs(fract(lines * vUv.x) * 2.0 - 1.0);
+      float x = cubicPulse(0.5, linewidth, sawthoothWaveX);
 
-      float sawthoothWave2 = abs(fract(lines * vUv.x) * 2.0 - 1.0);
-      float x = cubicPulse(0.5, linewidth, sawthoothWave2);
-      gl_FragColor = vec4(1.0, 1.0, 1.0, x) + vec4(1.0, 1.0, 1.0, y);
+      float sawthoothWaveY = abs(fract(lines * vUv.y) * 2.0 - 1.0);
+      float y = cubicPulse(0.5, linewidth, sawthoothWaveY);
+
+      vec3 result = color.rgb * (y + x);
+      gl_FragColor = vec4(result, alpha);
     }
     if(fragmentShaderIndex == 3){
       float sawthoothWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
