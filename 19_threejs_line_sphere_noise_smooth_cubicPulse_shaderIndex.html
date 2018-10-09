@@ -273,9 +273,10 @@
       float sawthoothWave = abs(fract(lines * vUv.y) * 2.0 - 1.0);
       float y = cubicPulse(0.5, linewidth, sawthoothWave);
       if (vUv.y < 0.5){
-        gl_FragColor = vec4(1.0, 0.0, 1.0, y);
+        vec3 invertColor = 1.0 - color.rgb;
+        gl_FragColor = vec4(invertColor, y);
       } else {
-        gl_FragColor = vec4(0.0, 1.0, 1.0, y);
+        gl_FragColor = vec4(color.rgb, y);
       }
     }
     if(fragmentShaderIndex == 4){
@@ -328,6 +329,7 @@
   var camera, scene, renderer;
   var mesh, material, uniforms;
   var gui;
+  var settings;
   var groupRotate = new THREE.Group();
   var clock = new THREE.Clock();
   init();
@@ -405,6 +407,22 @@
         max: 2
       }
     }
+
+    settings = {
+      fragmentShaderIndex: {
+        0: { color: [255.0, 255.0, 255.0] },
+        1: { color: [255.0, 255.0, 255.0] },
+        2: { color: [255.0, 255.0, 255.0] },
+        3: { color: [0.0, 255.0, 255.0] },
+        4: { color: [255.0, 255.0, 255.0] },
+        5: { color: [255.0, 255.0, 255.0] },
+        6: { color: [255.0, 255.0, 255.0] },
+        7: { color: [255.0, 255.0, 255.0] },
+        8: { color: [255.0, 255.0, 255.0] },
+        9: { color: [255.0, 255.0, 255.0] }
+      }
+    }
+
     var vertexShader = document.getElementById('vertexShader').text;
     var fragmentShader = document.getElementById('fragmentShader').text;
     material = new THREE.ShaderMaterial(
@@ -480,8 +498,8 @@
           if (ob[key].type == 'f' || ob[key].type == 'i') {
             if(typeof ob[key].min != 'undefined' && typeof ob[key].max != 'undefined'){
               let controller = uniformsFolder.add(ob[key], 'value').min(ob[key].min).max(ob[key].max).name(key).onChange(function (value) {
-                if(key == 'fragmentShaderIndex' && value == 2){
-                  let color = [0.0, 255.0, 255.0];
+                if(key == 'fragmentShaderIndex'){
+                  let color = settings.fragmentShaderIndex[value].color;
                   uniforms.color.guivalue = color;
                   gui.__folders.Uniforms.__controllers[0].__onChange(color);
                 }
